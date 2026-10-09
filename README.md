@@ -360,9 +360,6 @@ Re-run it after any final source changes.
 -   JavaScript / CSS
 -   Git and GitHub
 
-Confirm the installed dependencies in `requirements.txt` and
-`frontend/package.json` if updating this list.
-
 ## Project origin
 
 This project is a Python/React reconstruction of an original Excel/VBA
