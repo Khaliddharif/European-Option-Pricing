@@ -1,6 +1,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
+import { loadTrades, saveTrades } from "./services/tradeStorage";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
@@ -8,9 +9,9 @@ const fmt = (value, decimals = 2) =>
   value === null || value === undefined || !Number.isFinite(Number(value))
     ? "—"
     : Number(value).toLocaleString("en-US", {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
-      });
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
 
 const money = (value) => fmt(value, 2);
 
@@ -235,7 +236,7 @@ function DeleteConfirmation({ trade, onCancel, onConfirm, deleting }) {
           </div>
 
           <div className="confirmation-detail-row">
-            <span>Entry price <HelpTip text={assetType === "Future" ? "The futures price when you opened the position. P&L compares the current futures price with this entry price." : "The option premium per unit you paid (Long) or received (Short) when opening the position. P&L compares the current model value with this entry premium."} /></span>
+            <span>Entry price <HelpTip text={p.asset_type === "Future" ? "The futures price when you opened the position. P&L compares the current futures price with this entry price." : "The option premium per unit you paid (Long) or received (Short) when opening the position. P&L compares the current model value with this entry premium."} /></span>
             <strong>{money(p.entry_price)}</strong>
           </div>
 
@@ -307,10 +308,10 @@ function exportTradesCsv(trades) {
   const rows = trades.map((trade) => {
     const p = trade.position;
     return [trade.id, p.asset_type, p.position, p.quantity, p.entry_price,
-      p.asset_type === "Future" ? trade.spot : trade.analytics?.price,
-      tradePnl(trade), trade.spot, p.strike, p.volatility, p.maturity,
-      p.contract_multiplier, p.expiry_month, p.currency, p.tick_size, p.tick_value,
-      p.initial_margin, p.maintenance_margin, p.settlement_convention, trade.createdAt];
+    p.asset_type === "Future" ? trade.spot : trade.analytics?.price,
+    tradePnl(trade), trade.spot, p.strike, p.volatility, p.maturity,
+    p.contract_multiplier, p.expiry_month, p.currency, p.tick_size, p.tick_value,
+    p.initial_margin, p.maintenance_margin, p.settlement_convention, trade.createdAt];
   });
   const csv = [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\r\n");
   const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8;" });
@@ -344,7 +345,7 @@ function App() {
   const [maintenanceMargin, setMaintenanceMargin] = useState("");
   const [settlementConvention, setSettlementConvention] = useState("Daily mark-to-market");
 
-  const [trades, setTrades] = useState([]);
+  const [trades, setTrades] = useState(() => loadTrades());
   const [results, setResults] = useState(null);
   const [sensitivity, setSensitivity] = useState(null);
   const [portfolioResults, setPortfolioResults] = useState(null);
@@ -352,6 +353,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [deletingTradeId, setDeletingTradeId] = useState(null);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    saveTrades(trades);
+  }, [trades]);
 
   const isOption = assetType === "Call" || assetType === "Put";
 
@@ -536,6 +541,8 @@ function App() {
     }
   }
 
+
+
   async function handleConfirmDelete() {
     if (!pendingDeleteTrade) return;
 
@@ -547,26 +554,34 @@ function App() {
     setDeletingTradeId(tradeToDelete.id);
     setError("");
 
-    try {
-      const updatedPortfolio =
-        updatedTrades.length > 0
-          ? await requestJson(
-              "/portfolio",
-              makePortfolioPayload(updatedTrades)
-            )
-          : null;
+    // Delete locally first; the useEffect saves the journal.
+    setTrades(updatedTrades);
+    setPortfolioResults(null);
+    setPendingDeleteTrade(null);
 
-      setTrades(updatedTrades);
+    const validSpot = Number(spot) > 0 && Number.isFinite(Number(spot));
+
+    if (updatedTrades.length === 0 || !validSpot) {
+      setDeletingTradeId(null);
+      return;
+    }
+
+    try {
+      const updatedPortfolio = await requestJson(
+        "/portfolio",
+        makePortfolioPayload(updatedTrades)
+      );
       setPortfolioResults(updatedPortfolio);
-      setPendingDeleteTrade(null);
     } catch (requestError) {
       setError(
-        `Could not delete the trade because the portfolio could not be refreshed. ${errorText(requestError)}`
+        `Trade deleted, but the portfolio summary could not be refreshed. ${errorText(requestError)}`
       );
     } finally {
       setDeletingTradeId(null);
     }
   }
+
+
 
   const spotLabels = scenarioLabels(
     sensitivity?.spot_scenarios,
@@ -582,15 +597,15 @@ function App() {
 
   const currentPnl = results
     ? tradePnl({
-        position: {
-          asset_type: assetType,
-          position,
-          entry_price: Number(entryPrice),
-          quantity: Number(quantity),
-        },
-        analytics: results,
-        spot: Number(spot),
-      })
+      position: {
+        asset_type: assetType,
+        position,
+        entry_price: Number(entryPrice),
+        quantity: Number(quantity),
+      },
+      analytics: results,
+      spot: Number(spot),
+    })
     : null;
 
   const pnlClass =
@@ -1012,16 +1027,16 @@ function App() {
                   Export CSV
                 </button>
                 <button
-                className="secondary-button"
-                type="button"
-                onClick={() => {
-                  setTrades([]);
-                  setPortfolioResults(null);
-                  setError("");
-                }}
-              >
-                Clear Journal
-              </button>
+                  className="secondary-button"
+                  type="button"
+                  onClick={() => {
+                    setTrades([]);
+                    setPortfolioResults(null);
+                    setError("");
+                  }}
+                >
+                  Clear Journal
+                </button>
               </div>
             )}
           </div>
