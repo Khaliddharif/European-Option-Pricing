@@ -136,17 +136,35 @@ def test_sensitivity_endpoint():
 
     data = response.json()
 
-    assert len(data["spot_scenarios"]) == 9
+    assert len(data["spot_scenarios"]) == 5
+    assert data["spot_scenarios"] == [
+        80.0,
+        90.0,
+        100.0,
+        110.0,
+        120.0,
+    ]
+
     assert len(data["volatility_scenarios"]) == 5
+    assert data["volatility_scenarios"] == [
+        0.10,
+        0.15,
+        0.20,
+        0.25,
+        0.30,
+    ]
 
-    assert len(data["pnl_matrix"]) == 9
-    assert len(data["delta_matrix"]) == 9
-    assert len(data["gamma_matrix"]) == 9
-    assert len(data["theta_matrix"]) == 9
-    assert len(data["vega_matrix"]) == 9
-
+    assert len(data["pnl_matrix"]) == 5
     assert all(len(row) == 5 for row in data["pnl_matrix"])
+
+    assert len(data["delta_matrix"]) == 5
     assert all(len(row) == 5 for row in data["delta_matrix"])
+
+    assert len(data["gamma_matrix"]) == 5
     assert all(len(row) == 5 for row in data["gamma_matrix"])
+
+    assert len(data["theta_matrix"]) == 5
     assert all(len(row) == 5 for row in data["theta_matrix"])
+
+    assert len(data["vega_matrix"]) == 5
     assert all(len(row) == 5 for row in data["vega_matrix"])

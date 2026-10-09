@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class PricingRequest(BaseModel):
@@ -41,6 +41,20 @@ class PositionRequest(BaseModel):
     maturity: float | None = Field(default=None, gt=0)
     strike: float | None = Field(default=None, gt=0)
     volatility: float | None = Field(default=None, gt=0)
+    contract_multiplier: float = Field(default=1.0, gt=0)
+    expiry_month: str | None = Field(default=None, max_length=32)
+    currency: str = Field(default="EUR", min_length=3, max_length=3, pattern="^[A-Za-z]{3}$")
+    tick_size: float | None = Field(default=None, gt=0)
+    tick_value: float | None = Field(default=None, gt=0)
+    initial_margin: float = Field(default=0.0, ge=0)
+    maintenance_margin: float = Field(default=0.0, ge=0)
+    settlement_convention: str = Field(default="Daily mark-to-market", pattern="^(Cash|Physical|Daily mark-to-market|Other)$")
+
+    @model_validator(mode="after")
+    def validate_margin_relationship(self):
+        if self.initial_margin > 0 and self.maintenance_margin > self.initial_margin:
+            raise ValueError("Maintenance margin cannot exceed initial margin.")
+        return self
 
 
 class PortfolioRequest(BaseModel):
@@ -57,6 +71,8 @@ class PortfolioResponse(BaseModel):
     gamma: float
     theta: float
     vega: float
+    initial_margin: float = 0.0
+    maintenance_margin: float = 0.0
 
 
 class SensitivityRequest(BaseModel):
@@ -73,6 +89,10 @@ class SensitivityRequest(BaseModel):
 
 
 class SensitivityResponse(BaseModel):
+    spot_sensitivity: dict
+    volatility_sensitivity: dict
+
+    # Legacy combined matrices retained for compatibility.
     spot_scenarios: list[float]
     volatility_scenarios: list[float]
     pnl_matrix: list[list[float]]

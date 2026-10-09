@@ -1,0 +1,1024 @@
+
+:root {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #e6edf7;
+  background: #0b1018;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color-scheme: dark;
+
+  --bg: #0b1018;
+  --panel: #111925;
+  --panel-raised: #151f2d;
+  --border: #273447;
+  --text: #e6edf7;
+  --text-soft: #93a2b8;
+  --accent: #76a9fa;
+  --positive: #68d5a0;
+  --negative: #ee898f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at top left, rgba(50, 83, 131, 0.12), transparent 42%),
+    var(--bg);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.app {
+  width: 100%;
+  max-width: 1800px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 0 26px 40px;
+}
+
+/* Header */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 0 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.app-eyebrow {
+  margin-bottom: 10px;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 1.7px;
+}
+
+.topbar h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(23px, 2.4vw, 34px);
+  font-weight: 680;
+  letter-spacing: -0.9px;
+  line-height: 1.25;
+}
+
+.topbar p {
+  margin: 9px 0 0;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--text-soft);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--positive);
+  box-shadow: 0 0 10px rgba(104, 213, 160, 0.3);
+}
+
+/* Main layout: inputs and analytics side by side */
+
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+  width: 100%;
+}
+
+.dashboard > .input-card,
+.dashboard > .results-card {
+  grid-column: span 1;
+  min-width: 0;
+}
+
+.dashboard > .sensitivity-card,
+.dashboard > .portfolio-risk-card,
+.dashboard > .journal-card {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+/* Cards */
+
+.card {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(145deg, #131e2c, #101824);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.09);
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.card-header h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.2px;
+  line-height: 1.4;
+}
+
+.card-header p {
+  margin: 6px 0 0;
+  color: var(--text-soft);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 6px 9px;
+  border: 1px solid #30425a;
+  border-radius: 6px;
+  background: rgba(118, 169, 250, 0.07);
+  color: #a9caff;
+  font-size: 10px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+/* Trade input form */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px 15px;
+}
+
+.form-grid label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+  min-width: 0;
+}
+
+.form-grid label > span {
+  display: block;
+  color: #b4c0d1;
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 1.4;
+}
+
+.form-grid input,
+.form-grid select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 39px;
+  margin: 0;
+  padding: 0 11px;
+  border: 1px solid #314056;
+  border-radius: 6px;
+  outline: none;
+  background: #0c1420;
+  color: var(--text);
+  font-size: 12px;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.form-grid select {
+  cursor: pointer;
+}
+
+.form-grid input:focus,
+.form-grid select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(118, 169, 250, 0.1);
+}
+
+.calculate-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 41px;
+  margin-top: 21px;
+  padding: 0 17px;
+  border: 1px solid #6799ed;
+  border-radius: 7px;
+  background: #477fcf;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 650;
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.calculate-button:hover:not(:disabled) {
+  background: #568ee0;
+}
+
+.calculate-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.secondary-button {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: #c7d2e1;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.secondary-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.error-message {
+  margin-top: 16px;
+  padding: 11px 13px;
+  border: 1px solid rgba(238, 137, 143, 0.35);
+  border-radius: 7px;
+  background: rgba(238, 137, 143, 0.08);
+  color: #ffadb2;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* Analytics metrics */
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+  min-height: 88px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(5, 12, 22, 0.25);
+}
+
+.metric-label {
+  color: var(--text-soft);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.metric-value {
+  max-width: 100%;
+  color: var(--text);
+  font-size: clamp(17px, 1.6vw, 23px);
+  font-weight: 680;
+  letter-spacing: -0.5px;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-hint {
+  color: #718198;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  padding: 20px;
+  border: 1px dashed #2b394d;
+  border-radius: 8px;
+  background: rgba(5, 12, 22, 0.17);
+  text-align: center;
+}
+
+.placeholder p {
+  max-width: 520px;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* Current trade summary */
+
+.trade-summary {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: rgba(5, 12, 22, 0.2);
+}
+
+.trade-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.trade-summary-header h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.trade-direction,
+.journal-side {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 8px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.trade-direction.long,
+.journal-side.long {
+  border-color: rgba(104, 213, 160, 0.25);
+  background: rgba(104, 213, 160, 0.08);
+  color: var(--positive);
+}
+
+.trade-direction.short,
+.journal-side.short {
+  border-color: rgba(238, 137, 143, 0.25);
+  background: rgba(238, 137, 143, 0.08);
+  color: var(--negative);
+}
+
+.trade-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.trade-pnl {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.positive-value {
+  color: var(--positive) !important;
+}
+
+.negative-value {
+  color: var(--negative) !important;
+}
+
+.neutral-value {
+  color: var(--text-soft) !important;
+}
+
+/* Sensitivity tables and journal */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.sensitivity-table,
+.trader-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.sensitivity-table th,
+.sensitivity-table td,
+.trader-table th,
+.trader-table td {
+  padding: 12px 13px;
+  border-bottom: 1px solid rgba(39, 52, 71, 0.8);
+  text-align: right;
+}
+
+.sensitivity-table th,
+.trader-table th {
+  background: #121d2b;
+  color: var(--text-soft);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.sensitivity-table th:first-child,
+.sensitivity-table td:first-child,
+.trader-table th:first-child,
+.trader-table td:first-child {
+  text-align: left;
+}
+
+.sensitivity-table td,
+.trader-table td {
+  color: #d1dbea;
+  font-variant-numeric: tabular-nums;
+}
+
+.sensitivity-table tbody tr:last-child td,
+.trader-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.sensitivity-table tbody tr:hover,
+.trader-table tbody tr:hover {
+  background: rgba(118, 169, 250, 0.035);
+}
+
+.portfolio-risk-card .metrics-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.portfolio-api-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.portfolio-table td.positive-value,
+.portfolio-table td.negative-value,
+.portfolio-table td.neutral-value {
+  font-weight: 650;
+}
+
+.trade-id-cell {
+  max-width: 175px;
+  overflow-wrap: anywhere;
+  font-size: 10px;
+}
+
+.trade-id-cell span {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.remove-button {
+  min-height: 29px;
+  padding: 0 10px;
+  border: 1px solid rgba(238, 137, 143, 0.3);
+  border-radius: 5px;
+  background: rgba(238, 137, 143, 0.06);
+  color: #f09ba0;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.remove-button:hover:not(:disabled) {
+  border-color: rgba(238, 137, 143, 0.65);
+  background: rgba(238, 137, 143, 0.13);
+}
+
+.journal-disclaimer {
+  margin: 14px 0 0;
+  color: var(--text-soft);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+/* Delete confirmation */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(5, 9, 16, 0.76);
+  backdrop-filter: blur(5px);
+}
+
+.confirmation-dialog {
+  width: min(100%, 440px);
+  max-height: min(90vh, 720px);
+  overflow-y: auto;
+  padding: 25px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+  animation: confirmation-enter 160ms ease-out;
+}
+
+.confirmation-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(229, 149, 149, 0.3);
+  border-radius: 50%;
+  background: rgba(228, 124, 124, 0.1);
+  color: #e59595;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.confirmation-title {
+  margin: 0 0 9px;
+  font-size: 20px;
+  font-weight: 650;
+}
+
+.confirmation-message {
+  margin: 0 0 20px;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.confirmation-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 22px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.confirmation-trade-id {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-width: 0;
+  font-size: 12px;
+}
+
+.confirmation-trade-id span {
+  flex: 0 0 auto;
+  color: var(--text-soft);
+}
+
+.confirmation-trade-id strong {
+  min-width: 0;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.confirmation-trade-description {
+  padding-bottom: 11px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.confirmation-detail-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 12px;
+}
+
+.confirmation-detail-row span {
+  color: var(--text-soft);
+}
+
+.confirmation-detail-row strong {
+  text-align: right;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.confirmation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-button,
+.confirm-delete-button {
+  min-height: 40px;
+  padding: 0 15px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.cancel-button {
+  border-color: var(--border);
+  background: transparent;
+  color: var(--text);
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.confirm-delete-button {
+  border-color: #a94f57;
+  background: #a94f57;
+  color: #fff;
+}
+
+.confirm-delete-button:hover:not(:disabled) {
+  border-color: #bf5c65;
+  background: #bf5c65;
+}
+
+.cancel-button:focus-visible,
+.confirm-delete-button:focus-visible {
+  outline: 2px solid #86aefb;
+  outline-offset: 3px;
+}
+
+@keyframes confirmation-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive layouts */
+
+@media (max-width: 1050px) {
+  .portfolio-risk-card .metrics-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 850px) {
+  .dashboard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dashboard > .input-card,
+  .dashboard > .results-card,
+  .dashboard > .sensitivity-card,
+  .dashboard > .portfolio-risk-card,
+  .dashboard > .journal-card {
+    grid-column: 1 / -1;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .status-indicator {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 560px) {
+  .app {
+    padding: 0 12px 24px;
+  }
+
+  .topbar {
+    padding-top: 22px;
+  }
+
+  .topbar h1 {
+    font-size: 25px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .form-grid,
+  .metrics-grid,
+  .trade-summary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .portfolio-risk-card .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card-header {
+    gap: 10px;
+  }
+
+  .confirmation-dialog {
+    padding: 20px;
+  }
+
+  .confirmation-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-button,
+  .confirm-delete-button {
+    width: 100%;
+    min-height: 43px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+
+/* Compact, balanced top dashboard cards */
+.dashboard > .input-card,
+.dashboard > .results-card {
+  align-self: start;
+  min-width: 0;
+}
+
+/* Reduce Option Analytics height */
+.results-card {
+  padding: 18px;
+}
+
+.results-card .card-header {
+  margin-bottom: 14px;
+}
+
+.results-card .metrics-grid {
+  gap: 9px;
+}
+
+.results-card .metric {
+  min-height: 72px;
+  padding: 11px 12px;
+  gap: 5px;
+}
+
+.results-card .metric-value {
+  font-size: 19px;
+}
+
+.results-card .metric-label,
+.results-card .metric-hint {
+  font-size: 10px;
+}
+
+.results-card .trade-summary {
+  margin-top: 12px;
+  padding: 12px;
+}
+
+.results-card .trade-summary-header {
+  margin-bottom: 10px;
+}
+
+.results-card .trade-summary-grid {
+  gap: 8px;
+}
+
+.results-card .trade-summary-grid .metric {
+  min-height: 63px;
+  padding: 9px 10px;
+}
+
+.results-card .trade-pnl {
+  margin-top: 10px;
+  padding-top: 9px;
+}
+
+/* Keep input controls compact and consistent */
+.input-card {
+  padding: 20px;
+}
+
+.input-card .card-header {
+  margin-bottom: 18px;
+}
+
+.input-card .form-grid {
+  gap: 14px 13px;
+}
+
+.input-card .calculate-button {
+  margin-top: 17px;
+}
+
+@media (max-width: 850px) {
+  .results-card {
+    padding: 18px;
+  }
+}
+
+
+
+/* Refined top-row layout */
+@media (min-width: 851px) {
+  .dashboard > .input-card,
+  .dashboard > .results-card {
+    align-self: stretch;
+  }
+
+  /* Six analytics metrics in two compact rows */
+  .results-card > .metrics-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .results-card > .metrics-grid .metric {
+    min-height: 76px;
+    padding: 10px;
+  }
+
+  .results-card > .metrics-grid .metric-value {
+    font-size: 18px;
+  }
+
+  /* Keep the current trade summary on one compact row */
+  .results-card .trade-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .results-card .trade-summary-grid .metric {
+    min-height: 68px;
+    padding: 9px;
+  }
+
+  .results-card .trade-summary-grid .metric-value {
+    font-size: 17px;
+  }
+
+  /* P&L is already shown in its metric card */
+  .results-card .trade-pnl {
+    display: none;
+  }
+}
+
+/* Prevent cramped metrics on smaller screens */
+@media (min-width: 851px) and (max-width: 1100px) {
+  .results-card > .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .results-card .trade-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Native title tooltips avoid duplicate explanations and modal overlap. */
+.help-tip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 15px;
+  width: 15px;
+  height: 15px;
+  margin-left: 5px;
+  padding: 0;
+  border: 1px solid #6885ad;
+  border-radius: 50%;
+  background: rgba(118, 169, 250, 0.1);
+  color: #b9d3ff;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1;
+  cursor: help;
+  vertical-align: middle;
+}
+.help-tip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.metric-label .help-tip { margin-left: 6px; }
+.form-grid label > span { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; }
+
+/* Tighter input spacing supports fast entry using the Tab key. */
+.input-card .form-grid {
+  gap: 9px 11px;
+}
+.input-card .form-grid label { gap: 4px; }
+.input-card .form-grid input,
+.input-card .form-grid select { height: 36px; }
+.input-card .calculate-button { margin-top: 12px; }
+.journal-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.app-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 18px;
+  margin-top: 26px;
+  padding: 16px 0 4px;
+  border-top: 1px solid var(--border);
+  color: var(--text-soft);
+  font-size: 11px;
+}
+.app-footer a { color: #a9caff; text-decoration: none; }
+.app-footer a:hover, .app-footer a:focus-visible { text-decoration: underline; }
+@media (max-width: 560px) {
+  .app-footer { align-items: flex-start; flex-direction: column; }
+  .journal-actions { justify-content: flex-start; }
+}
+
+/* Release roadmap label and footer note. */
+.coming-soon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  padding: 5px 9px;
+  border: 1px solid #66532c;
+  border-radius: 999px;
+  background: rgba(225, 173, 67, 0.08);
+  color: #f1c76b;
+  font-size: 11px;
+  font-weight: 600;
+}
+.coming-soon-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e8b957;
+}
+.footer-roadmap { color: #e8c36d; }
+
+
+/* Emphasize scenario variation headings separately from Greek row labels. */
+.sensitivity-table th.scenario-label {
+  color: #eaf2ff;
+  font-weight: 800;
+}

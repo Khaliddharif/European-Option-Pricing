@@ -1,10 +1,6 @@
 from dataclasses import dataclass
-
 from backend.app.models.position import Position
-from backend.app.portfolio.calculator import (
-    PositionResult,
-    calculate_position,
-)
+from backend.app.portfolio.calculator import PositionResult, calculate_position
 
 
 @dataclass
@@ -15,29 +11,23 @@ class PortfolioResult:
     gamma: float
     theta: float
     vega: float
+    initial_margin: float = 0.0
+    maintenance_margin: float = 0.0
 
 
 def calculate_portfolio(
-    positions: list[Position],
-    spot: float,
-    rate: float,
-    dividend_yield: float = 0.0,
+    positions: list[Position], spot: float, rate: float, dividend_yield: float = 0.0,
 ) -> PortfolioResult:
     results: list[PositionResult] = [
-        calculate_position(
-            position=position,
-            spot=spot,
-            rate=rate,
-            dividend_yield=dividend_yield,
-        )
-        for position in positions
+        calculate_position(position, spot, rate, dividend_yield) for position in positions
     ]
-
     return PortfolioResult(
-        market_value=sum(result.market_value for result in results),
-        pnl=sum(result.pnl for result in results),
-        delta=sum(result.delta for result in results),
-        gamma=sum(result.gamma for result in results),
-        theta=sum(result.theta for result in results),
-        vega=sum(result.vega for result in results),
+        market_value=sum(r.market_value for r in results),
+        pnl=sum(r.pnl for r in results),
+        delta=sum(r.delta for r in results),
+        gamma=sum(r.gamma for r in results),
+        theta=sum(r.theta for r in results),
+        vega=sum(r.vega for r in results),
+        initial_margin=sum(r.initial_margin for r in results),
+        maintenance_margin=sum(r.maintenance_margin for r in results),
     )

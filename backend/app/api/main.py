@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.api.schemas import (
     PricingRequest,
@@ -31,12 +32,28 @@ from backend.app.sensitivity.calculator import (
     generate_volatility_scenarios,
     calculate_pnl_matrix,
     calculate_greek_matrix,
+    calculate_spot_sensitivity,
+    calculate_volatility_sensitivity,
 )
 
 
 app = FastAPI(
     title="Option Pricing Tool API",
     version="1.0.0",
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -134,6 +151,14 @@ def calculate_portfolio_api(
             maturity=position.maturity,
             strike=position.strike,
             volatility=position.volatility,
+            contract_multiplier=position.contract_multiplier,
+            expiry_month=position.expiry_month,
+            currency=position.currency.upper(),
+            tick_size=position.tick_size,
+            tick_value=position.tick_value,
+            initial_margin=position.initial_margin,
+            maintenance_margin=position.maintenance_margin,
+            settlement_convention=position.settlement_convention,
         )
         for position in request.positions
     ]
@@ -152,6 +177,8 @@ def calculate_portfolio_api(
         gamma=result.gamma,
         theta=result.theta,
         vega=result.vega,
+        initial_margin=result.initial_margin,
+        maintenance_margin=result.maintenance_margin,
     )
 
 
@@ -159,18 +186,18 @@ def calculate_portfolio_api(
     "/sensitivity",
     response_model=SensitivityResponse,
 )
-def calculate_sensitivity(
+def sensitivity(
     request: SensitivityRequest,
 ) -> SensitivityResponse:
-    spot_scenarios = generate_spot_scenarios(
-        request.spot
-    )
+    """
+    Calculate trader-oriented spot and implied-volatility
+    sensitivity analysis.
 
-    volatility_scenarios = generate_volatility_scenarios(
-        request.volatility
-    )
+    The endpoint also returns the legacy combined matrices
+    so existing API consumers and tests remain compatible.
+    """
 
-    pnl_matrix = calculate_pnl_matrix(
+    spot_sensitivity = calculate_spot_sensitivity(
         option_type=request.option_type,
         spot=request.spot,
         strike=request.strike,
@@ -183,64 +210,94 @@ def calculate_sensitivity(
         dividend_yield=request.dividend_yield,
     )
 
-    delta_matrix = calculate_greek_matrix(
-        greek="delta",
+    volatility_sensitivity = calculate_volatility_sensitivity(
         option_type=request.option_type,
         spot=request.spot,
         strike=request.strike,
         volatility=request.volatility,
         rate=request.rate,
         maturity=request.maturity,
-        quantity=request.quantity,
-        position=request.position,
-        dividend_yield=request.dividend_yield,
-    )
-
-    gamma_matrix = calculate_greek_matrix(
-        greek="gamma",
-        option_type=request.option_type,
-        spot=request.spot,
-        strike=request.strike,
-        volatility=request.volatility,
-        rate=request.rate,
-        maturity=request.maturity,
-        quantity=request.quantity,
-        position=request.position,
-        dividend_yield=request.dividend_yield,
-    )
-
-    theta_matrix = calculate_greek_matrix(
-        greek="theta",
-        option_type=request.option_type,
-        spot=request.spot,
-        strike=request.strike,
-        volatility=request.volatility,
-        rate=request.rate,
-        maturity=request.maturity,
-        quantity=request.quantity,
-        position=request.position,
-        dividend_yield=request.dividend_yield,
-    )
-
-    vega_matrix = calculate_greek_matrix(
-        greek="vega",
-        option_type=request.option_type,
-        spot=request.spot,
-        strike=request.strike,
-        volatility=request.volatility,
-        rate=request.rate,
-        maturity=request.maturity,
+        entry_price=request.entry_price,
         quantity=request.quantity,
         position=request.position,
         dividend_yield=request.dividend_yield,
     )
 
     return SensitivityResponse(
-        spot_scenarios=spot_scenarios,
-        volatility_scenarios=volatility_scenarios,
-        pnl_matrix=pnl_matrix,
-        delta_matrix=delta_matrix,
-        gamma_matrix=gamma_matrix,
-        theta_matrix=theta_matrix,
-        vega_matrix=vega_matrix,
+        # New trader-oriented sensitivity results
+        spot_sensitivity=spot_sensitivity,
+        volatility_sensitivity=volatility_sensitivity,
+
+        # Existing combined sensitivity results
+        spot_scenarios=generate_spot_scenarios(
+            request.spot
+        ),
+        volatility_scenarios=generate_volatility_scenarios(
+            request.volatility
+        ),
+
+        pnl_matrix=calculate_pnl_matrix(
+            option_type=request.option_type,
+            spot=request.spot,
+            strike=request.strike,
+            volatility=request.volatility,
+            rate=request.rate,
+            maturity=request.maturity,
+            entry_price=request.entry_price,
+            quantity=request.quantity,
+            position=request.position,
+            dividend_yield=request.dividend_yield,
+        ),
+
+        delta_matrix=calculate_greek_matrix(
+            greek="delta",
+            option_type=request.option_type,
+            spot=request.spot,
+            strike=request.strike,
+            volatility=request.volatility,
+            rate=request.rate,
+            maturity=request.maturity,
+            quantity=request.quantity,
+            position=request.position,
+            dividend_yield=request.dividend_yield,
+        ),
+
+        gamma_matrix=calculate_greek_matrix(
+            greek="gamma",
+            option_type=request.option_type,
+            spot=request.spot,
+            strike=request.strike,
+            volatility=request.volatility,
+            rate=request.rate,
+            maturity=request.maturity,
+            quantity=request.quantity,
+            position=request.position,
+            dividend_yield=request.dividend_yield,
+        ),
+
+        theta_matrix=calculate_greek_matrix(
+            greek="theta",
+            option_type=request.option_type,
+            spot=request.spot,
+            strike=request.strike,
+            volatility=request.volatility,
+            rate=request.rate,
+            maturity=request.maturity,
+            quantity=request.quantity,
+            position=request.position,
+            dividend_yield=request.dividend_yield,
+        ),
+
+        vega_matrix=calculate_greek_matrix(
+            greek="vega",
+            option_type=request.option_type,
+            spot=request.spot,
+            strike=request.strike,
+            volatility=request.volatility,
+            rate=request.rate,
+            maturity=request.maturity,
+            quantity=request.quantity,
+            position=request.position,
+            dividend_yield=request.dividend_yield,
+        ),
     )
