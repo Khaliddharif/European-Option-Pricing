@@ -378,7 +378,7 @@ analysis, and API concerns into testable modules.
 
 ## Developer
 
-It's me Khalid Dharif: Hello world! :D
+Hello world! It's me Khalid Dharif :D
 
 -   Email: <khalid.dharif@gmail.com>
 -   GitHub: [github.com/Khaliddharif](https://github.com/Khaliddharif)
